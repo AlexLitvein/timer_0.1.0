@@ -43,6 +43,12 @@ class MyStore {
     ADD_TIMER = 'ADD_TIMER';
     LOAD_STORE = 'LOAD_STORE';
     TICK = 'TICK';
+    START_TIMER = 'START_TIMER';
+    STOP_TIMER = 'STOP_TIMER';
+    PAUSE_TIMER = 'PAUSE_TIMER';
+    STOPED = 0;
+    PAUSED = 1;
+    STARTED = 2;
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
@@ -66,8 +72,43 @@ class MyStore {
         };
     }
     #tick(state) {
+        console.log('tick');
+
         state.timers.forEach((el, idx, arr) => {
-            // arr[idx] = el + 1;
+            // console.log(el);
+
+            // switch (el.status) {
+            //     case this.STARTED:
+            //         arr[idx].start += 1000;
+            //         break;
+            //     default:
+            //         break;
+            // }
+            // let currDate = new Date(arr[idx].start);
+            // arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
+
+            let currDate = 0;
+            if (el.status === this.STARTED) {
+                // console.log('STARTED');
+                if (el.end === 0) { // если секундомер
+                    arr[idx].start += 1000;
+                    currDate = new Date(arr[idx].start);
+                } else { // stopwatch
+                    arr[idx].end -= 1000;
+                    let sub = new Date(arr[idx].end - arr[idx].start);
+                    if (sub <= 0) {
+                        sub = 0;
+                        arr[idx].status = this.STOPED;
+                    }
+                    currDate = new Date(sub);
+                }
+
+                // let currDate = new Date(Date.now() - el.start);
+                arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
+                // `${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`
+            }
+
+
         });
     }
     reducer = (state = this.#initialState, action) => {
@@ -78,8 +119,19 @@ class MyStore {
             case this.LOAD_STORE:
                 state = action.payload;
                 break;
+            case this.START_TIMER:
+                state.timers[action.payload].status = this.STARTED;
+                state = { ...state, bRender: !state.bRender };
+                break;
+            case this.STOP_TIMER:
+                state.timers[action.payload].status = this.STOPED;
+                // state = { ...state, bRender: !state.bRender };
+                break;
+            case this.PAUSE_TIMER:
+                state.timers[action.payload].status = this.PAUSED;
+                // state = { ...state, bRender: !state.bRender };
+                break;
             case this.TICK:
-                console.log('TICK');
                 this.#tick(state);
                 state = { ...state, bRender: !state.bRender };
                 break;
@@ -89,12 +141,14 @@ class MyStore {
         return state;
     }
 
-    createTimerObj(startDate, endDate = 0, name = 'timer-' + Date.now()) {
+    createTimerObj(startDate = 0, endDate = 0, name = 'timer-' + Date.now()) {
         return {
             name: name,
             start: startDate,
             end: endDate,
             curr: 0,
+            status: this.STOPED,
+            display: '00:00:00',
         }
     }
 }
