@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { TimerList } from './Timer';
 // import { Timer } from './Timer';
 
+// TODO: стоп обнуляет таймер
 
 // const state = {
 //   bRender: true,
@@ -17,10 +18,15 @@ function App() {
   const dispatch = useDispatch();
 
 
-  const click = () => {
-    // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(Date.now(), Date.now() + 6000)));
+  const addEvent = () => {
+    dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj('', Date.now(), Date.now() + 6000, MyStore.TYPE_EVENT)));
+    // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+  }
+
+  const addStopwatch = () => {
     dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
   }
+  
 
   useEffect(() => {
     // dispatch(MyStore.setAction(MyStore.LOAD_STORE, state));
@@ -48,7 +54,8 @@ function App() {
   return (
     <div className="App">
       {/* {doRender} */}
-      <button onClick={click}>clk</button>
+      <button onClick={addStopwatch}>Секундомер</button>
+      <button onClick={addEvent}>Событие</button>
       <TimerList />
       {/* <div>{timersElements}</div> */}
       {console.log('draw App')}
