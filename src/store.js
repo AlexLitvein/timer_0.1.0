@@ -52,7 +52,8 @@ class MyStore {
     TYPE_STOPWATCH = 0;
     TYPE_EVENT = 1;
     DISPLAY_DEFAULT = '00:00:00';
-    SET_TIMER_END = 'SET_TIMER_END';
+    // SET_TIMER_END = 'SET_TIMER_END';
+    SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
@@ -93,12 +94,14 @@ class MyStore {
             el.start = 0;
         }
     }
-    setTimerEnd = (state, idx, date) => {
-        const el = state.timers[idx];
+    setTimerParams = (state, params) => {
+        const el = state.timers[params.idx];
+        el.name = params.name;
+        el.date = params.date;
         // if (el.type === this.TYPE_STOPWATCH) {
         //     el.start = 0;
         // }
-        el.end = date;
+        // el.end = date;
     }
     formatDate = (date) => {
         return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
@@ -109,11 +112,11 @@ class MyStore {
             let currDate = 0;
             if (el.status === this.STARTED) {
                 if (el.type === this.TYPE_STOPWATCH) { // если секундомер (stopwatch)
-                    el.start += 1000;
-                    currDate = new Date(el.start);
+                    el.date += 1000;
+                    currDate = new Date(el.date);
                 } else { // event
                     currDate = Date.now();
-                    let sub = new Date(el.end - Date.now());
+                    let sub = new Date(el.date - Date.now());
                     if (sub <= 0) {
                         sub = 0;
                         this.stopTimer(state, idx);
@@ -143,8 +146,8 @@ class MyStore {
             case this.PAUSE_TIMER:
                 state.timers[action.payload].status = this.PAUSED;
                 break;
-            case this.SET_TIMER_END:
-                this.setTimerEnd(state, action.payload.idx, action.payload.date);
+            case this.SET_TIMER_PARAMS:
+                this.setTimerParams(state, action.payload);
                 // state.timers[action.payload.idx].end = action.payload.date;
                 break;
             case this.TICK:
@@ -157,12 +160,25 @@ class MyStore {
         return state;
     }
 
-    createTimerObj(name = '', startDate = 0, endDate = 0, type = this.TYPE_STOPWATCH,) {
+    // createTimerObj(name = '', date = 0, type = this.TYPE_STOPWATCH,) {
+    //     return {
+    //         name: name,
+    //         type: type,
+    //         date: date,
+    //         // start: startDate,
+    //         // end: endDate,
+    //         // curr: 0,
+    //         status: this.STOPED,
+    //         display: this.DISPLAY_DEFAULT,
+    //     }
+    // }
+    createTimerObj(type = this.TYPE_STOPWATCH) {
         return {
-            name: name,
+            name: '',
             type: type,
-            start: startDate,
-            end: endDate,
+            date: 0,
+            // start: startDate,
+            // end: endDate,
             // curr: 0,
             status: this.STOPED,
             display: this.DISPLAY_DEFAULT,

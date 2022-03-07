@@ -19,7 +19,7 @@ function App() {
 
 
   const addEvent = () => {
-    dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj('', Date.now(), Date.now() + 6000, MyStore.TYPE_EVENT)));
+    dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(MyStore.TYPE_EVENT)));
     // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
   }
 
