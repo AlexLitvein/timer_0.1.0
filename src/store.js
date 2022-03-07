@@ -52,6 +52,7 @@ class MyStore {
     TYPE_STOPWATCH = 0;
     TYPE_EVENT = 1;
     DISPLAY_DEFAULT = '00:00:00';
+    SET_TIMER_END = 'SET_TIMER_END';
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
@@ -76,11 +77,11 @@ class MyStore {
     }
     addTimer = (state, timer) => {
         if (!timer.name) {
-            if(timer.type === this.TYPE_STOPWATCH){
+            if (timer.type === this.TYPE_STOPWATCH) {
                 timer.name = 'timer ' + state.timers.length;
             } else {
                 timer.name = 'event ' + state.timers.length;
-            }            
+            }
         }
         state.timers.push(timer);
     }
@@ -92,43 +93,34 @@ class MyStore {
             el.start = 0;
         }
     }
-
-
+    setTimerEnd = (state, idx, date) => {
+        const el = state.timers[idx];
+        // if (el.type === this.TYPE_STOPWATCH) {
+        //     el.start = 0;
+        // }
+        el.end = date;
+    }
+    formatDate = (date) => {
+        return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+    }
     #tick(state) {
         console.log('tick');
-
         state.timers.forEach((el, idx, arr) => {
-            // console.log(el);
-
-            // switch (el.status) {
-            //     case this.STARTED:
-            //         arr[idx].start += 1000;
-            //         break;
-            //     default:
-            //         break;
-            // }
-            // let currDate = new Date(arr[idx].start);
-            // arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
-
             let currDate = 0;
             if (el.status === this.STARTED) {
-                // console.log('STARTED');
                 if (el.type === this.TYPE_STOPWATCH) { // если секундомер (stopwatch)
-                    arr[idx].start += 1000;
-                    currDate = new Date(arr[idx].start);
+                    el.start += 1000;
+                    currDate = new Date(el.start);
                 } else { // event
-                    arr[idx].end -= 1000;
-                    let sub = new Date(arr[idx].end - arr[idx].start);
+                    currDate = Date.now();
+                    let sub = new Date(el.end - Date.now());
                     if (sub <= 0) {
                         sub = 0;
-                        arr[idx].status = this.STOPED;
+                        this.stopTimer(state, idx);
                     }
                     currDate = new Date(sub);
                 }
-
-                // let currDate = new Date(Date.now() - el.start);
-                arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
-                // `${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`
+                el.display = this.formatDate(currDate);
             }
         });
     }
@@ -151,6 +143,10 @@ class MyStore {
             case this.PAUSE_TIMER:
                 state.timers[action.payload].status = this.PAUSED;
                 break;
+            case this.SET_TIMER_END:
+                this.setTimerEnd(state, action.payload.idx, action.payload.date);
+                // state.timers[action.payload.idx].end = action.payload.date;
+                break;
             case this.TICK:
                 this.#tick(state);
                 state = { ...state, bRender: !state.bRender };
@@ -167,7 +163,7 @@ class MyStore {
             type: type,
             start: startDate,
             end: endDate,
-            // curr: 0, // ??
+            // curr: 0,
             status: this.STOPED,
             display: this.DISPLAY_DEFAULT,
         }

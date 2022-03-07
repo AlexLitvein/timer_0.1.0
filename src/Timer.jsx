@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import MyStore from './store';
 
 const TimerHeader = ({ idx, elm }) => {
-    const [name, setName]=useState(elm.name);
+    const [name, setName] = useState(elm.name);
     const changeName = (el) => {
         setName(el.target.value);
-    }    
+    }
     return <>
-        {/* <span>{elm.name}: </span> */}
         <input id={idx + '_name'} type='text' value={name} onChange={changeName}></input>
     </>;
 }
@@ -22,15 +21,33 @@ const ButtonControls = ({ idx, elm }) => {
 }
 
 const EventControls = ({ idx, elm }) => {
-    const [selOver, setSelOver] = useState('0');
+    const dispatch = useDispatch();
+    const [selHow, setSelHow] = useState('0');
     const [selStart, setSelStart] = useState(createInputDate());
-    const changeOver = (el) => {
-        // console.log(el.target.value);
-        setSelOver(el.target.value);
-        // console.log(selStart);
+    const changeHow = (el) => {
+        setSelHow(el.target.value);
+        // let date = new Date(el.target.value);
+        // elm.end = undefined;
+        // console.log(`${el.target.value} ${el.target.innerText}`);
     }
     const changeStart = (el) => {
         setSelStart(el.target.value);
+        let date = new Date(el.target.value);
+        // console.log(date);
+        dispatch(MyStore.setAction(MyStore.SET_TIMER_END, { idx: idx, date: date }));
+    }
+    const changeOver = (el) => {
+        let n = parseInt(el.target.innerText);
+        let mul = 1000;
+        if (el.target.value === 'm') {
+            mul = 60000;
+        }
+        if (el.target.value === 'h') {
+            mul = 3600000;
+        }
+        dispatch(MyStore.setAction(MyStore.SET_TIMER_END, { idx: idx, date: n * mul }));
+        // console.log(el.target);
+        // console.log(`${el.target.value} ${el.target.innerText}`);
     }
     function createInputDate() {
         let res = new Date();
@@ -40,21 +57,21 @@ const EventControls = ({ idx, elm }) => {
     const renderSelTime = () => {
         let res;
         // console.log(selStart);
-        if (selOver === '0') {
+        if (selHow === '0') {
             res =
-                <select id="choose-time" >
+                <select id={idx + '_choose-time'} onChange={changeOver}>
                     <option value="s">5 сек</option>
-                    <option value="m">1 мин</option>
+                    <option value="s">10 сек</option>
                 </select>
         } else {
-            res = <input id="sel-time" type='datetime-local' value={selStart} onChange={changeStart}></input>
+            res = <input id={idx + '_sel-time'} type='datetime-local' value={selStart} onChange={changeStart}></input>
         }
         return res;
     }
 
     return <>
         <label htmlFor="sel-start" >Произойдет&nbsp;&nbsp;</label>
-        <select id="sel-start" onChange={changeOver}>
+        <select id="sel-start" onChange={changeHow}>
             <option value="0">через</option>
             <option value="1">в</option>
         </select>
@@ -68,7 +85,7 @@ const Timer = ({ idx, elm }) => {
             <TimerHeader idx={idx} elm={elm} />
             {elm.type === MyStore.TYPE_EVENT ? <EventControls idx={idx} elm={elm} /> : null}
             <ButtonControls idx={idx} elm={elm} />
-            <span>прошло: {elm.display}</span>
+            <span>{elm.type === MyStore.TYPE_EVENT ? 'осталось' : 'прошло'} {elm.display}</span>
         </div>
     );
 }
@@ -169,12 +186,10 @@ export const TimerList = () => {
             // } else {
             //     comp = <Stopwatch key={idx} idx={idx} elm={el} />
             // }
-
             // console.log(el);
             return (
                 // comp
                 <Timer key={idx} idx={idx} elm={el} />
-                // <div key={idx}>{el.name}</div>
             )
         });
     }, [timers, bRender]); // 
