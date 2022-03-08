@@ -13,7 +13,6 @@ const TimerHeader = ({ elm }) => {
 }
 
 const ButtonControls = ({ elm }) => {
-    // let cls; // btn-status
     return <>
         <button className={elm.status === 2 ? 'btn-status' : ''} name='start_btn' type='button'>start</button>
         {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? 'btn-status' : ''} name='pause_btn' type='button'>pause</button> : null}
@@ -23,15 +22,11 @@ const ButtonControls = ({ elm }) => {
 }
 
 const EventControls = ({ elm }) => {
-    // const dispatch = useDispatch();
     const [selHow, setSelHow] = useState(elm.type);
-    const [selOver, setSelOver] = useState(elm.date);
+    const [selOver, setSelOver] = useState(elm.timeOver);
     const [selStart, setSelStart] = useState(createInputDate(elm));
     const changeHow = (e) => {
-        setSelHow(e.target.value);
-        // let date = new Date(el.target.value);
-        // elm.end = undefined;
-        // console.log(`${el.target.value} ${el.target.innerText}`);
+        setSelHow(+e.target.value);
     }
     const changeStart = (e) => {
         setSelStart(e.target.value);
@@ -43,30 +38,39 @@ const EventControls = ({ elm }) => {
         setSelOver(e.target.value);
     }
     function createInputDate(elm) {
-        let date = elm.date || null;
+        // let now = Date.now();
+        let date = elm.date || Date.now();
         let res = new Date(date);
-        res.setHours(res.getHours() - res.getTimezoneOffset() / 60);
+        // let tz = res.getTimezoneOffset();
+        res.setHours(res.getHours() - res.getTimezoneOffset() / 60); // только для res.toJSON() тк он преобразует дату к UTC те отнимет часовой пояс
         return res.toJSON().slice(0, 19);
+
+        // let date1 = res.toJSON().slice(0, 19);
+        // let date2 = res.toString();
+        // let date3 = res.toLocaleString();
+        // let date4 = res.toLocaleDateString();
+        // let date5 = res.toLocaleTimeString();
+        // return res;
     }
     const renderSelTime = () => {
         let res;
         // console.log(selStart);value={selOver} 
-        if (selHow === '1') {
+        if (selHow === 1) {
             res =
-                <select name='choose_time' value={selOver} onChange={changeOver}>
+                <select name='time_over' value={selOver} onChange={changeOver}>
                     <option value="5 s">5 сек</option>
                     <option value="10 s">10 сек</option>
                 </select>
-        } 
-        if (selHow === '2') {
-            res = <input name='choose_time' type='datetime-local' value={selStart} onChange={changeStart}></input>
+        }
+        if (selHow === 2) {
+            res = <input name='time_over' type='datetime-local' value={selStart} onChange={changeStart}></input>
         }
         return res;
     }
 
     return <>
-        <label htmlFor="sel-start" >Произойдет&nbsp;&nbsp;</label>
-        <select name='sel_start' id="sel-start" value = {selHow} onChange={changeHow}>
+        <label htmlFor="sel_how" >Произойдет&nbsp;&nbsp;</label>
+        <select name='sel_how' id="sel_how" value={selHow} onChange={changeHow}>
             <option value="1">через</option>
             <option value="2">в</option>
         </select>
@@ -77,16 +81,9 @@ const EventControls = ({ elm }) => {
 const Timer = ({ idx, elm }) => {
     const dispatch = useDispatch();
 
-    const click = (e) => {
-        // e.preventDefault();
-        // e.stopPropagation();
-
-        const form = e.currentTarget;
+    const saveParams = (form) => {
         let date;
-        let idx = parseInt(e.currentTarget.id);
-        // console.log("el.currentTarget.name:", e.currentTarget.name);
-
-        let startDateStr = form.elements.choose_time?.value;
+        let startDateStr = form.elements.time_over?.value;
         if (startDateStr) { // event
             let strArr = startDateStr.split(' ');
             if (strArr.length === 2) { // over date input
@@ -100,16 +97,17 @@ const Timer = ({ idx, elm }) => {
                 }
                 date = Date.now() + (n * mul);
             } else {
-                date = new Date(form.elements.choose_time.value)
+                date = new Date(form.elements.time_over.value).getTime();
             }
-            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: form.elements.sel_start.value, idx: idx }));
+            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: +form.elements.sel_how.value, idx: idx, timeOver: form.elements.time_over.value }));
         }
+    }
 
+    const click = (e) => {
+        let idx = parseInt(e.currentTarget.id);
         if (e.target.name === 'start_btn') {
+            saveParams(e.currentTarget); // form
             dispatch(MyStore.setAction(MyStore.START_TIMER, idx));
-            // temp
-            // MyStore.saveStore();
-            // dispatch(MyStore.setAction(MyStore.SAVE_STORE));
         }
         if (e.target.name === 'pause_btn') {
             dispatch(MyStore.setAction(MyStore.PAUSE_TIMER, idx));
@@ -132,111 +130,18 @@ const Timer = ({ idx, elm }) => {
     );
 }
 
-// const Stopwatch = ({ idx, elm }) => {
-//     return (
-//         <div className='timer-elm'>
-//             {/* <span>{elm.name}: </span> */}
-//             <TimerHeader idx={idx} elm={elm} />
-
-//             {/* <button id={idx + '_start'}>start</button>
-//             <button id={idx + '_pause'}>pause</button>
-//             <button id={idx + '_stop'}>stop</button> */}
-//             <ButtonControls idx={idx} elm={elm} />
-//             <span>прошло: {elm.display}</span>
-//         </div>
-//     );
-// }
-
-// const Event = ({ idx, elm }) => {
-//     const [selOver, setSelOver] = useState('0');
-//     const [selStart, setSelStart] = useState(createInputDate());
-//     const changeOver = (el) => {
-//         // console.log(el.target.value);
-//         setSelOver(el.target.value);
-//         // console.log(selStart);
-//     }
-//     const changeStart = (el) => {
-//         setSelStart(el.target.value);
-//     }
-//     function createInputDate() {
-//         let res = new Date();
-//         res.setHours(res.getHours() - res.getTimezoneOffset() / 60);
-//         return res.toJSON().slice(0, 19);
-//     }
-
-
-//     const renderSelTime = () => {
-//         let res;
-//         // console.log(selStart);
-
-//         if (selOver === '0') {
-//             res =
-//                 <select id="choose-time" >
-//                     <option value="s">5 сек</option>
-//                     <option value="m">1 мин</option>
-//                 </select>
-//         } else {
-//             res = <input id="sel-time" type='datetime-local' value={selStart} onChange={changeStart}></input>
-//         }
-//         return res;
-//     }
-
-//     return (
-//         <div className='timer-elm'>
-//             <span>{elm.name}: </span>
-//             <label htmlFor="sel-start" >Произойдет&nbsp;&nbsp;</label>
-//             <select id="sel-start" onChange={changeOver}>
-//                 <option value="0">через</option>
-//                 <option value="1">в</option>
-//             </select>
-//             {renderSelTime()}
-//             <button id={idx + '_start'}>start</button>
-//             <button id={idx + '_stop'}>stop</button>
-//             <span>осталось: {elm.display}</span>
-//         </div>
-//     )
-// }
-
 export const TimerList = () => {
-    // const dispatch = useDispatch();
     const timers = useSelector(MyStore.selTimers);
     const bRender = useSelector(MyStore.selRenderFlag);
 
-    // const click = (el) => {
-    //     // console.log(el.target);
-    //     // console.log(`${el.target.id} ${el.target.className}`);
-    //     let idx = parseInt(el.target.id);
-    //     if (el.target.tagName === 'BUTTON') {
-    //         // console.log(idx);
-    //         if (el.target.id.includes('start')) {
-    //             dispatch(MyStore.setAction(MyStore.START_TIMER, idx));
-    //         }
-    //         if (el.target.id.includes('pause')) {
-    //             dispatch(MyStore.setAction(MyStore.PAUSE_TIMER, idx));
-    //         }
-    //         if (el.target.id.includes('stop')) {
-    //             dispatch(MyStore.setAction(MyStore.STOP_TIMER, idx));
-    //         }
-    //     }
-    // }
-
     const timersElements = useMemo(() => {
         return timers.map((el, idx) => {
-            // let comp;
-            // if (el.type === MyStore.TYPE_EVENT) {
-            //     comp = <Event key={idx} idx={idx} elm={el} />
-            // } else {
-            //     comp = <Stopwatch key={idx} idx={idx} elm={el} />
-            // }
-            // console.log(el);
             return (
-                // comp
                 <Timer key={idx} idx={idx} elm={el} />
             )
         });
     }, [timers, bRender]); // 
     return (
-        // <div onClick={click}>{timersElements}</div>
         <div>{timersElements}</div>
     )
 }

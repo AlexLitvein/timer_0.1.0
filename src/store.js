@@ -51,9 +51,9 @@ class MyStore {
     STOPED = 0;
     PAUSED = 1;
     STARTED = 2;
-    TYPE_STOPWATCH = '0';
-    TYPE_EVENT_OVER = '1';
-    TYPE_EVENT_AT = '2';
+    TYPE_STOPWATCH = 0;
+    TYPE_EVENT_OVER = 1;
+    TYPE_EVENT_AT = 2;
     DISPLAY_DEFAULT = '00:00:00';
     // SET_TIMER_END = 'SET_TIMER_END';
     SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
@@ -112,14 +112,7 @@ class MyStore {
     }
     setTimerParams = (state, params) => {
         const el = state.timers[params.idx];
-        el.name = params.name;
-        el.date = params.date;
-        el.type = params.type;
-        // el = {...params};
-        // if (el.type === this.TYPE_STOPWATCH) {
-        //     el.start = 0;
-        // }
-        // el.end = date;
+        state.timers[params.idx] = {...el, ...params};
     }
     formatDate = (date) => {
         return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
@@ -206,7 +199,7 @@ class MyStore {
             name: '',
             type: type,
             date: 0,
-            // start: startDate,
+            timeOver: '',
             // end: endDate,
             // curr: 0,
             status: this.STOPED,

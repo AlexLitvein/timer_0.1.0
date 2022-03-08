@@ -7,6 +7,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { TimerList } from './Timer';
 
 function App() {
+
+  // let now0 = Date.now();
+  // let now = new Date(Date.now());
+  // let date1 = new Date().getTime();
+  // let date2 = JSON.stringify(now);
+  // let res = new Date(date);
+  // let tz = res.getTimezoneOffset();
+  // res.setHours(res.getHours() - tz / 60);
+
+
   const dispatch = useDispatch();
 
   const addEvent = () => {
