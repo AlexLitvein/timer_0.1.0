@@ -41,7 +41,9 @@ import { createStore } from 'redux';
 
 class MyStore {
     ADD_TIMER = 'ADD_TIMER';
+    DEL_TIMER='DEL_TIMER';
     LOAD_STORE = 'LOAD_STORE';
+    SAVE_STORE = 'SAVE_STORE';
     TICK = 'TICK';
     START_TIMER = 'START_TIMER';
     STOP_TIMER = 'STOP_TIMER';
@@ -49,8 +51,9 @@ class MyStore {
     STOPED = 0;
     PAUSED = 1;
     STARTED = 2;
-    TYPE_STOPWATCH = 0;
-    TYPE_EVENT = 1;
+    TYPE_STOPWATCH = '0';
+    TYPE_EVENT_OVER = '1';
+    TYPE_EVENT_AT = '2';
     DISPLAY_DEFAULT = '00:00:00';
     // SET_TIMER_END = 'SET_TIMER_END';
     SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
@@ -63,6 +66,17 @@ class MyStore {
 
     constructor() {
         this.store = createStore(this.reducer);
+    }
+    loadStore() {
+        let store;
+        const str = localStorage.getItem('my_timer');
+        if (str) {
+            store = JSON.parse(str);
+        }
+        return store;
+    }
+    saveStore(state) {        
+        localStorage.setItem('my_timer', JSON.stringify(state));
     }
     selTimers(store) {
         return store.timers;
@@ -91,13 +105,17 @@ class MyStore {
         el.status = this.STOPED;
         el.display = this.DISPLAY_DEFAULT;
         if (el.type === this.TYPE_STOPWATCH) {
-            el.start = 0;
+            el.date = 0;
         }
+        // console.log("el:", el);
+        // console.log("state.timers[idx]:", state.timers[idx]);
     }
     setTimerParams = (state, params) => {
         const el = state.timers[params.idx];
         el.name = params.name;
         el.date = params.date;
+        el.type = params.type;
+        // el = {...params};
         // if (el.type === this.TYPE_STOPWATCH) {
         //     el.start = 0;
         // }
@@ -133,8 +151,19 @@ class MyStore {
                 this.addTimer(state, action.payload);
                 state = { ...state, timers: [...state.timers] };
                 break;
+                case this.DEL_TIMER:
+                    state.timers.splice(action.payload, 1);
+                    state = { ...state, bRender: !state.bRender };
+                    this.saveStore(state);
+                break;
             case this.LOAD_STORE:
-                state = action.payload;
+                const oldStore = this.loadStore();
+                if (oldStore) {
+                    state = oldStore;
+                }
+                break;
+            case this.SAVE_STORE:
+                this.saveStore(state);
                 break;
             case this.START_TIMER:
                 state.timers[action.payload].status = this.STARTED;

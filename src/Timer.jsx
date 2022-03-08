@@ -13,18 +13,20 @@ const TimerHeader = ({ elm }) => {
 }
 
 const ButtonControls = ({ elm }) => {
+    // let cls; // btn-status
     return <>
-        <button name='start_btn'>start</button>
-        {elm.type === MyStore.TYPE_STOPWATCH ? <button name='pause_btn'>pause</button> : null}
-        <button name='stop_btn'>stop</button>
+        <button className={elm.status === 2 ? 'btn-status' : ''} name='start_btn' type='button'>start</button>
+        {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? 'btn-status' : ''} name='pause_btn' type='button'>pause</button> : null}
+        <button className={elm.status === 0 ? 'btn-status' : ''} name='stop_btn' type='button'>stop</button>
+        <button name='del_btn' type='button'>del</button>
     </>;
 }
 
-const EventControls = () => {
+const EventControls = ({ elm }) => {
     // const dispatch = useDispatch();
-    const [selHow, setSelHow] = useState('0');
-    const [selOver, setSelOver] = useState('s');
-    const [selStart, setSelStart] = useState(createInputDate());
+    const [selHow, setSelHow] = useState(elm.type);
+    const [selOver, setSelOver] = useState(elm.date);
+    const [selStart, setSelStart] = useState(createInputDate(elm));
     const changeHow = (e) => {
         setSelHow(e.target.value);
         // let date = new Date(el.target.value);
@@ -40,22 +42,23 @@ const EventControls = () => {
     const changeOver = (e) => {
         setSelOver(e.target.value);
     }
-
-    function createInputDate() {
-        let res = new Date();
+    function createInputDate(elm) {
+        let date = elm.date || null;
+        let res = new Date(date);
         res.setHours(res.getHours() - res.getTimezoneOffset() / 60);
         return res.toJSON().slice(0, 19);
     }
     const renderSelTime = () => {
         let res;
         // console.log(selStart);value={selOver} 
-        if (selHow === '0') {
+        if (selHow === '1') {
             res =
-                <select name='choose_time' onChange={changeOver}>
-                    <option value="s">5 сек</option>
-                    <option value="s">10 сек</option>
+                <select name='choose_time' value={selOver} onChange={changeOver}>
+                    <option value="5 s">5 сек</option>
+                    <option value="10 s">10 сек</option>
                 </select>
-        } else {
+        } 
+        if (selHow === '2') {
             res = <input name='choose_time' type='datetime-local' value={selStart} onChange={changeStart}></input>
         }
         return res;
@@ -63,9 +66,9 @@ const EventControls = () => {
 
     return <>
         <label htmlFor="sel-start" >Произойдет&nbsp;&nbsp;</label>
-        <select id="sel-start" onChange={changeHow}>
-            <option value="0">через</option>
-            <option value="1">в</option>
+        <select name='sel_start' id="sel-start" value = {selHow} onChange={changeHow}>
+            <option value="1">через</option>
+            <option value="2">в</option>
         </select>
         {renderSelTime()}
     </>;
@@ -75,41 +78,38 @@ const Timer = ({ idx, elm }) => {
     const dispatch = useDispatch();
 
     const click = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
+        // e.stopPropagation();
+
         const form = e.currentTarget;
         let date;
-        // console.log(el.target);
-        // console.log(`${el.target.id} ${el.target.className}`);
         let idx = parseInt(e.currentTarget.id);
         // console.log("el.currentTarget.name:", e.currentTarget.name);
-        // console.log("el.target.name:", e.target.name);
 
-        let dateStr = form.elements.choose_time.value;
-        if (dateStr.length === 1) { // over date input
-            let n = parseInt(form.elements.choose_time.innerText);
-
-            console.log("n", n);
-
-            let mul = 1000;
-            if (dateStr === 'm') {
-                mul = 60000;
+        let startDateStr = form.elements.choose_time?.value;
+        if (startDateStr) { // event
+            let strArr = startDateStr.split(' ');
+            if (strArr.length === 2) { // over date input
+                let n = parseInt(strArr[0]);
+                let mul = 1000;
+                if (strArr[2] === 'm') {
+                    mul = 60000;
+                }
+                if (strArr[2] === 'h') {
+                    mul = 3600000;
+                }
+                date = Date.now() + (n * mul);
+            } else {
+                date = new Date(form.elements.choose_time.value)
             }
-            if (dateStr === 'h') {
-                mul = 3600000;
-            }
-            date = Date.now() + (n * mul);
-        } else {
-            date = new Date(dateStr)
+            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: form.elements.sel_start.value, idx: idx }));
         }
-
-        dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, idx: idx }));
-
-        // console.log("form.elements.name:", form.elements.name);
-        // if (e.target.tagName === 'BUTTON') {
-        // console.log(idx);
 
         if (e.target.name === 'start_btn') {
             dispatch(MyStore.setAction(MyStore.START_TIMER, idx));
+            // temp
+            // MyStore.saveStore();
+            // dispatch(MyStore.setAction(MyStore.SAVE_STORE));
         }
         if (e.target.name === 'pause_btn') {
             dispatch(MyStore.setAction(MyStore.PAUSE_TIMER, idx));
@@ -117,15 +117,17 @@ const Timer = ({ idx, elm }) => {
         if (e.target.name === 'stop_btn') {
             dispatch(MyStore.setAction(MyStore.STOP_TIMER, idx));
         }
-        // }
+        if (e.target.name === 'del_btn') {
+            dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
+        }
     }
 
     return (
         <form className='timer-elm' id={idx + '_timer'} onClick={click}>
             <TimerHeader elm={elm} />
-            {elm.type === MyStore.TYPE_EVENT ? <EventControls/> : null}
+            {elm.type !== MyStore.TYPE_STOPWATCH ? <EventControls elm={elm} /> : null}
             <ButtonControls elm={elm} />
-            <span>{elm.type === MyStore.TYPE_EVENT ? 'осталось' : 'прошло'} {elm.display}</span>
+            <span>{elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</span>
         </form>
     );
 }
