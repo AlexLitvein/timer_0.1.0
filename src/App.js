@@ -4,7 +4,7 @@ import './reset.css';
 import { useDispatch, useSelector } from 'react-redux';
 import MyStore from './store';
 import { useEffect, useMemo, useState } from 'react';
-import { TimerList } from './Timer';
+import { TimerComponent, TimerList } from './Timer';
 
 function App() {
 
@@ -49,7 +49,7 @@ function App() {
       {/* {doRender} */}
       <button onClick={addStopwatch}>Секундомер</button>
       <button onClick={addEvent}>Событие</button>
-      <TimerList />
+      <TimerComponent />
       {console.log('draw App')}
     </div>
 

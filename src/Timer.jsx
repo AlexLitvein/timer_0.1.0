@@ -18,6 +18,7 @@ const ButtonControls = ({ elm }) => {
         {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? 'btn-status' : ''} name='pause_btn' type='button'>pause</button> : null}
         <button className={elm.status === 0 ? 'btn-status' : ''} name='stop_btn' type='button'>stop</button>
         <button name='del_btn' type='button'>del</button>
+        <button name='show_btn' className={elm.displayStatus === true ? 'btn-status' : ''} type='button'>show</button>
     </>;
 }
 
@@ -78,7 +79,7 @@ const EventControls = ({ elm }) => {
     </>;
 }
 
-const Timer = ({ idx, elm }) => {
+const TimerItem = ({ idx, elm }) => {
     const dispatch = useDispatch();
 
     const saveParams = (form) => {
@@ -118,10 +119,13 @@ const Timer = ({ idx, elm }) => {
         if (e.target.name === 'del_btn') {
             dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
         }
+        if (e.target.name === 'show_btn') {
+            dispatch(MyStore.setAction(MyStore.SHOW_TIMER, idx));
+        }
     }
 
     return (
-        <form className='timer-elm' id={idx + '_timer'} onClick={click}>
+        <form className='timer-list-item' id={idx + '_timer'} onClick={click}>
             <TimerHeader elm={elm} />
             {elm.type !== MyStore.TYPE_STOPWATCH ? <EventControls elm={elm} /> : null}
             <ButtonControls elm={elm} />
@@ -137,11 +141,49 @@ export const TimerList = () => {
     const timersElements = useMemo(() => {
         return timers.map((el, idx) => {
             return (
-                <Timer key={idx} idx={idx} elm={el} />
+                <TimerItem key={idx} idx={idx} elm={el} />
             )
         });
     }, [timers, bRender]); // 
     return (
-        <div>{timersElements}</div>
+        <div className="timer-list">{timersElements}</div>
+    )
+}
+
+const TimerTabloid = () => {   
+    // const timersToDisplay = useSelector(MyStore.selTimersToDisplay);
+    const timers = useSelector(MyStore.selTimers);
+    const bRender = useSelector(MyStore.selRenderFlag);
+
+    const renderTimersToDisplay = useMemo(() => {
+        const res = timers.map((el, idx)=>{
+            return (
+                el.displayStatus === MyStore.DISPLAY_STATUS_SHOW ? <TimerTabloidItem key={idx} elm={el}/> : null
+            )
+        })
+        return res;
+    }, [bRender]);
+
+    return (
+        <div className="timer-tabloid">
+            {renderTimersToDisplay}
+        </div>
+    )
+}
+
+const TimerTabloidItem = ({elm}) => {
+    
+    return (
+        <div className="timer-tabloid-item">{elm.name}: {elm.display}</div>
+    )
+}
+
+
+export const TimerComponent = () => {
+    return (
+        <div className='timer'>
+            <TimerList />
+            <TimerTabloid />
+        </div>
     )
 }

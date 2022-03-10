@@ -41,13 +41,14 @@ import { createStore } from 'redux';
 
 class MyStore {
     ADD_TIMER = 'ADD_TIMER';
-    DEL_TIMER='DEL_TIMER';
+    DEL_TIMER = 'DEL_TIMER';
     LOAD_STORE = 'LOAD_STORE';
     SAVE_STORE = 'SAVE_STORE';
     TICK = 'TICK';
     START_TIMER = 'START_TIMER';
     STOP_TIMER = 'STOP_TIMER';
     PAUSE_TIMER = 'PAUSE_TIMER';
+    SHOW_TIMER = 'SHOW_TIMER';
     STOPED = 0;
     PAUSED = 1;
     STARTED = 2;
@@ -55,13 +56,16 @@ class MyStore {
     TYPE_EVENT_OVER = 1;
     TYPE_EVENT_AT = 2;
     DISPLAY_DEFAULT = '00:00:00';
+    DISPLAY_STATUS_NONE = false;
+    DISPLAY_STATUS_SHOW = true;
     // SET_TIMER_END = 'SET_TIMER_END';
     SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
         bRender: true,
-        timers: []
+        timers: [],
+        // timersToDisplay: [] // [idx, idx, ...]
     };
 
     constructor() {
@@ -75,12 +79,15 @@ class MyStore {
         }
         return store;
     }
-    saveStore(state) {        
+    saveStore(state) {
         localStorage.setItem('my_timer', JSON.stringify(state));
     }
     selTimers(store) {
         return store.timers;
     }
+    // selTimersToDisplay(store) {
+    //     return store.timersToDisplay;
+    // }
     selRenderFlag(store) {
         return store.bRender;
     }
@@ -104,15 +111,15 @@ class MyStore {
         const el = state.timers[idx];
         el.status = this.STOPED;
         el.display = this.DISPLAY_DEFAULT;
-        if (el.type === this.TYPE_STOPWATCH) {
-            el.date = 0;
-        }
+        // if (el.type === this.TYPE_STOPWATCH) {
+        //     el.date = 0;
+        // }
         // console.log("el:", el);
         // console.log("state.timers[idx]:", state.timers[idx]);
     }
     setTimerParams = (state, params) => {
         const el = state.timers[params.idx];
-        state.timers[params.idx] = {...el, ...params};
+        state.timers[params.idx] = { ...el, ...params };
     }
     formatDate = (date) => {
         return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
@@ -144,10 +151,15 @@ class MyStore {
                 this.addTimer(state, action.payload);
                 state = { ...state, timers: [...state.timers] };
                 break;
-                case this.DEL_TIMER:
-                    state.timers.splice(action.payload, 1);
-                    state = { ...state, bRender: !state.bRender };
-                    this.saveStore(state);
+            case this.SHOW_TIMER:
+                // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
+                state.timers[action.payload].displayStatus = !state.timers[action.payload].displayStatus;
+                state = { ...state, bRender: !state.bRender };
+                break;
+            case this.DEL_TIMER:
+                state.timers.splice(action.payload, 1);
+                state = { ...state, bRender: !state.bRender };
+                this.saveStore(state);
                 break;
             case this.LOAD_STORE:
                 const oldStore = this.loadStore();
@@ -203,6 +215,7 @@ class MyStore {
             // end: endDate,
             // curr: 0,
             status: this.STOPED,
+            displayStatus: this.DISPLAY_STATUS_NONE,
             display: this.DISPLAY_DEFAULT,
         }
     }
