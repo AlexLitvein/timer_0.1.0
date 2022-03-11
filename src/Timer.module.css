@@ -1,0 +1,38 @@
+.timer{
+    display:flex;
+    height:100%;
+    border: 1px solid green;
+  }
+  
+  .timerNameInput{
+    width: 7rem;
+  }
+  
+  .timerTtabloid{
+    display:flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    border: 1px solid green;
+    /* height:100%; */
+  }
+  
+  .timerTabloidItem{
+    flex-grow: 1;
+    border: 1px solid plum;
+    height: 50px;
+    min-width: 100px;
+  }
+  
+  .timerList{
+    border: 1px solid peru;
+  
+  }
+  
+  .timerListItem{
+    border: 1px solid gray;
+    margin: 2px;
+  }
+  
+  .btnActive{
+    background-color:chartreuse;
+  }

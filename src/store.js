@@ -111,9 +111,9 @@ class MyStore {
         const el = state.timers[idx];
         el.status = this.STOPED;
         el.display = this.DISPLAY_DEFAULT;
-        // if (el.type === this.TYPE_STOPWATCH) {
-        //     el.date = 0;
-        // }
+        if (el.type === this.TYPE_STOPWATCH) {
+            el.date = 0;
+        }
         // console.log("el:", el);
         // console.log("state.timers[idx]:", state.timers[idx]);
     }
@@ -149,16 +149,20 @@ class MyStore {
         switch (action.type) {
             case this.ADD_TIMER:
                 this.addTimer(state, action.payload);
+                // state = { ...state, timers: [...state.timers] };
+                // state = { ...state, bRender: !state.bRender };
                 state = { ...state, timers: [...state.timers] };
                 break;
             case this.SHOW_TIMER:
                 // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
                 state.timers[action.payload].displayStatus = !state.timers[action.payload].displayStatus;
-                state = { ...state, bRender: !state.bRender };
+                // state = { ...state, bRender: !state.bRender };
+                state = { ...state, timers: [...state.timers] };
                 break;
             case this.DEL_TIMER:
                 state.timers.splice(action.payload, 1);
-                state = { ...state, bRender: !state.bRender };
+                // state = { ...state, bRender: !state.bRender };
+                state = { ...state, timers: [...state.timers] };
                 this.saveStore(state);
                 break;
             case this.LOAD_STORE:
@@ -172,13 +176,16 @@ class MyStore {
                 break;
             case this.START_TIMER:
                 state.timers[action.payload].status = this.STARTED;
-                state = { ...state, bRender: !state.bRender };
+                // state = { ...state, bRender: !state.bRender };
+                state = { ...state, timers: [...state.timers] };
                 break;
             case this.STOP_TIMER:
                 this.stopTimer(state, action.payload);
+                state = { ...state, timers: [...state.timers] };
                 break;
             case this.PAUSE_TIMER:
                 state.timers[action.payload].status = this.PAUSED;
+                state = { ...state, timers: [...state.timers] };
                 break;
             case this.SET_TIMER_PARAMS:
                 this.setTimerParams(state, action.payload);

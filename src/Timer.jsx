@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MyStore from './store';
+import timerStyles from './Timer.module.css'
 
 const TimerHeader = ({ elm }) => {
     const [name, setName] = useState(elm.name);
@@ -8,17 +9,17 @@ const TimerHeader = ({ elm }) => {
         setName(e.target.value);
     }
     return <>
-        <input name='name' type='text' value={name} onChange={changeName}></input>
+        <input name='name' className={timerStyles.timerNameInput} type='text' value={name} onChange={changeName}></input>
     </>;
 }
 
 const ButtonControls = ({ elm }) => {
     return <>
-        <button className={elm.status === 2 ? 'btn-status' : ''} name='start_btn' type='button'>start</button>
-        {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? 'btn-status' : ''} name='pause_btn' type='button'>pause</button> : null}
-        <button className={elm.status === 0 ? 'btn-status' : ''} name='stop_btn' type='button'>stop</button>
+        <button className={elm.status === 2 ? timerStyles.btnActive : ''} name='start_btn' type='button'>start</button>
+        {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? timerStyles.btnActive : ''} name='pause_btn' type='button'>pause</button> : null}
+        <button className={elm.status === 0 ? timerStyles.btnActive : ''} name='stop_btn' type='button'>stop</button>
         <button name='del_btn' type='button'>del</button>
-        <button name='show_btn' className={elm.displayStatus === true ? 'btn-status' : ''} type='button'>show</button>
+        <button name='show_btn' className={elm.displayStatus === true ? timerStyles.btnActive : ''} type='button'>show</button>
     </>;
 }
 
@@ -101,9 +102,17 @@ const TimerItem = ({ idx, elm }) => {
                 date = new Date(form.elements.time_over.value).getTime();
             }
             dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: +form.elements.sel_how.value, idx: idx, timeOver: form.elements.time_over.value }));
+        } else {
+            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, idx: idx }));
         }
+
     }
 
+    const onClickDel = () => {
+        if (window.confirm("Удалить?")) {
+            dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
+        }
+    }
     const click = (e) => {
         let idx = parseInt(e.currentTarget.id);
         if (e.target.name === 'start_btn') {
@@ -117,7 +126,7 @@ const TimerItem = ({ idx, elm }) => {
             dispatch(MyStore.setAction(MyStore.STOP_TIMER, idx));
         }
         if (e.target.name === 'del_btn') {
-            dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
+            onClickDel();
         }
         if (e.target.name === 'show_btn') {
             dispatch(MyStore.setAction(MyStore.SHOW_TIMER, idx));
@@ -125,18 +134,18 @@ const TimerItem = ({ idx, elm }) => {
     }
 
     return (
-        <form className='timer-list-item' id={idx + '_timer'} onClick={click}>
+        <form className={timerStyles.timerListItem} id={idx + '_timer'} onClick={click}>
             <TimerHeader elm={elm} />
             {elm.type !== MyStore.TYPE_STOPWATCH ? <EventControls elm={elm} /> : null}
             <ButtonControls elm={elm} />
-            <span>{elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</span>
+            {/* <span>{elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</span> */}
         </form>
     );
 }
 
 export const TimerList = () => {
     const timers = useSelector(MyStore.selTimers);
-    const bRender = useSelector(MyStore.selRenderFlag);
+    // const bRender = useSelector(MyStore.selRenderFlag);
 
     const timersElements = useMemo(() => {
         return timers.map((el, idx) => {
@@ -144,44 +153,44 @@ export const TimerList = () => {
                 <TimerItem key={idx} idx={idx} elm={el} />
             )
         });
-    }, [timers, bRender]); // 
+    }, [timers]); // ,  bRender
     return (
-        <div className="timer-list">{timersElements}</div>
+        <div className={timerStyles.timerList}>{timersElements}</div>
     )
 }
 
-const TimerTabloid = () => {   
+const TimerTabloid = () => {
     // const timersToDisplay = useSelector(MyStore.selTimersToDisplay);
     const timers = useSelector(MyStore.selTimers);
     const bRender = useSelector(MyStore.selRenderFlag);
 
     const renderTimersToDisplay = useMemo(() => {
-        const res = timers.map((el, idx)=>{
+        const res = timers.map((el, idx) => {
             return (
-                el.displayStatus === MyStore.DISPLAY_STATUS_SHOW ? <TimerTabloidItem key={idx} elm={el}/> : null
+                el.displayStatus === MyStore.DISPLAY_STATUS_SHOW ? <TimerTabloidItem key={idx} elm={el} /> : null
             )
         })
         return res;
     }, [bRender]);
 
     return (
-        <div className="timer-tabloid">
+        <div className={timerStyles.timerTtabloid}>
             {renderTimersToDisplay}
         </div>
     )
 }
 
-const TimerTabloidItem = ({elm}) => {
-    
+const TimerTabloidItem = ({ elm }) => {
+
     return (
-        <div className="timer-tabloid-item">{elm.name}: {elm.display}</div>
+        <div className={timerStyles.timerTabloidItem}>{elm.name}: {elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</div>
     )
 }
 
 
 export const TimerComponent = () => {
     return (
-        <div className='timer'>
+        <div className={timerStyles.timer}>
             <TimerList />
             <TimerTabloid />
         </div>

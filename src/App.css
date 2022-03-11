@@ -2,10 +2,14 @@
   /* text-align: center; */
 }
 
-.timer{
+/* .timer{
   display:flex;
   height:100%;
   border: 1px solid green;
+}
+
+.timer-name-input{
+  width: 7rem;
 }
 
 .timer-tabloid{
@@ -13,7 +17,6 @@
   flex-grow: 1;
   flex-wrap: wrap;
   border: 1px solid green;
-  /* height:100%; */
 }
 
 .timer-tabloid-item{
@@ -35,4 +38,4 @@
 
 .btn-status{
   background-color:chartreuse;
-}
+} */
