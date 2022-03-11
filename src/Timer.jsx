@@ -6,6 +6,7 @@ import timerStyles from './Timer.module.css'
 const TimerHeader = ({ elm }) => {
     const [name, setName] = useState(elm.name);
     const changeName = (e) => {
+        // e.preventDefault();
         setName(e.target.value);
     }
     return <>
@@ -14,13 +15,13 @@ const TimerHeader = ({ elm }) => {
 }
 
 const ButtonControls = ({ elm }) => {
-    return <>
+    return <div className={timerStyles.timerControlButtons}>
         <button className={elm.status === 2 ? timerStyles.btnActive : ''} name='start_btn' type='button'>start</button>
         {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? timerStyles.btnActive : ''} name='pause_btn' type='button'>pause</button> : null}
         <button className={elm.status === 0 ? timerStyles.btnActive : ''} name='stop_btn' type='button'>stop</button>
         <button name='del_btn' type='button'>del</button>
         <button name='show_btn' className={elm.displayStatus === true ? timerStyles.btnActive : ''} type='button'>show</button>
-    </>;
+    </div>;
 }
 
 const EventControls = ({ elm }) => {
@@ -65,19 +66,19 @@ const EventControls = ({ elm }) => {
                 </select>
         }
         if (selHow === 2) {
-            res = <input name='time_over' type='datetime-local' value={selStart} onChange={changeStart}></input>
+            res = <><br /><input name='time_over' type='datetime-local' value={selStart} onChange={changeStart}></input></>
         }
         return res;
     }
 
-    return <>
+    return <div className={timerStyles.eventControls}>
         <label htmlFor="sel_how" >Произойдет&nbsp;&nbsp;</label>
         <select name='sel_how' id="sel_how" value={selHow} onChange={changeHow}>
             <option value="1">через</option>
             <option value="2">в</option>
         </select>
         {renderSelTime()}
-    </>;
+    </div>;
 }
 
 const TimerItem = ({ idx, elm }) => {
@@ -107,13 +108,15 @@ const TimerItem = ({ idx, elm }) => {
         }
 
     }
-
     const onClickDel = () => {
         if (window.confirm("Удалить?")) {
             dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
         }
     }
     const click = (e) => {
+        // e.preventDefault();
+        // e.stopPropagation();
+
         let idx = parseInt(e.currentTarget.id);
         if (e.target.name === 'start_btn') {
             saveParams(e.currentTarget); // form
@@ -132,13 +135,15 @@ const TimerItem = ({ idx, elm }) => {
             dispatch(MyStore.setAction(MyStore.SHOW_TIMER, idx));
         }
     }
+    const formSubmit = (e) => {
+        e.preventDefault();
+    }
 
     return (
-        <form className={timerStyles.timerListItem} id={idx + '_timer'} onClick={click}>
+        <form className={timerStyles.timerListItem} id={idx + '_timer'} onClick={click} onSubmit={formSubmit}>
             <TimerHeader elm={elm} />
             {elm.type !== MyStore.TYPE_STOPWATCH ? <EventControls elm={elm} /> : null}
             <ButtonControls elm={elm} />
-            {/* <span>{elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</span> */}
         </form>
     );
 }

@@ -1,38 +1,55 @@
-.timer{
-    display:flex;
-    height:100%;
-    border: 1px solid green;
-  }
-  
-  .timerNameInput{
-    width: 7rem;
-  }
-  
-  .timerTtabloid{
-    display:flex;
-    flex-grow: 1;
-    flex-wrap: wrap;
-    border: 1px solid green;
-    /* height:100%; */
-  }
-  
-  .timerTabloidItem{
-    flex-grow: 1;
-    border: 1px solid plum;
-    height: 50px;
-    min-width: 100px;
-  }
-  
-  .timerList{
-    border: 1px solid peru;
-  
-  }
-  
-  .timerListItem{
-    border: 1px solid gray;
-    margin: 2px;
-  }
-  
-  .btnActive{
-    background-color:chartreuse;
-  }
+.timer {
+  font-size: 14px;
+  display: flex;
+  height: 100%;
+  border: 1px solid green;
+}
+
+.timerNameInput {
+  /* width: 7rem; */
+}
+
+.eventControls{
+  display: flex;
+}
+
+.timerControlButtons {
+  /* width: 7rem; */
+  display: flex;
+}
+
+.timerTtabloid {
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  border: 1px solid green;
+  /* height:100%; */
+}
+
+.timerTabloidItem {
+  flex-grow: 1;
+  border: 1px solid plum;
+  height: 50px;
+  min-width: 100px;
+}
+
+.timerList {
+  width: 260px;
+  border: 1px solid peru;
+}
+
+.timerListItem input,button,select {
+  flex-grow: 1;
+  /* background-color: brown; */
+}
+
+.timerListItem {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid gray;
+  margin: 2px;
+}
+
+.btnActive {
+  background-color: chartreuse;
+}
