@@ -1,0 +1,19 @@
+.cardViewer {
+    display: flex;
+    flex-direction: column;
+}
+
+.cardList {
+    display: flex;
+    /* flex-grow: 1; */
+    flex-wrap: wrap;
+    background-color: aquamarine;
+}
+
+.cardList > * {
+    flex-grow: 1;
+}
+
+.cardView {
+    flex-grow: 1;
+}
