@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { CardList, CardViewer } from './components/CardViewer/CardViewer';
 import MyStore from './store';
 import timerStyles from './Timer.module.css'
 
@@ -11,16 +12,27 @@ const TimerHeader = ({ elm }) => {
     }
     return <>
         <input name='name' className={timerStyles.timerNameInput} type='text' value={name} onChange={changeName}></input>
+
     </>;
 }
 
-const ButtonControls = ({ elm }) => {
+const ButtonControls = ({ idx, elm }) => {
+    const dispatch = useDispatch();
+    const addEvent = () => {
+        dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(MyStore.TYPE_EVENT_OVER)));
+    }
+    const addStopwatch = () => {
+        dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+    }
     return <div className={timerStyles.timerControlButtons}>
-        <button className={elm.status === 2 ? timerStyles.btnActive : ''} name='start_btn' type='button'>start</button>
-        {elm.type === MyStore.TYPE_STOPWATCH ? <button className={elm.status === 1 ? timerStyles.btnActive : ''} name='pause_btn' type='button'>pause</button> : null}
-        <button className={elm.status === 0 ? timerStyles.btnActive : ''} name='stop_btn' type='button'>stop</button>
-        <button name='del_btn' type='button'>del</button>
-        <button name='show_btn' className={elm.displayStatus === true ? timerStyles.btnActive : ''} type='button'>show</button>
+        <button onClick={addStopwatch}>Секундомер</button>
+        <button onClick={addEvent}>Событие</button>
+        <button >start</button>
+        {/* {elm.type === MyStore.TYPE_STOPWATCH ? <button >pause</button> : null} */}
+        {elm.type === MyStore.TYPE_STOPWATCH && <button >pause</button>}
+        <button >stop</button>
+        <button >del</button>
+        <button >show</button>
     </div>;
 }
 
@@ -81,105 +93,146 @@ const EventControls = ({ elm }) => {
     </div>;
 }
 
-const TimerItem = ({ idx, elm }) => {
-    const dispatch = useDispatch();
+const TimerItem = ({ idx, elm, select, onClick }) => {
+    // const dispatch = useDispatch();
 
-    const saveParams = (form) => {
-        let date;
-        let startDateStr = form.elements.time_over?.value;
-        if (startDateStr) { // event
-            let strArr = startDateStr.split(' ');
-            if (strArr.length === 2) { // over date input
-                let n = parseInt(strArr[0]);
-                let mul = 1000;
-                if (strArr[2] === 'm') {
-                    mul = 60000;
-                }
-                if (strArr[2] === 'h') {
-                    mul = 3600000;
-                }
-                date = Date.now() + (n * mul);
-            } else {
-                date = new Date(form.elements.time_over.value).getTime();
-            }
-            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: +form.elements.sel_how.value, idx: idx, timeOver: form.elements.time_over.value }));
-        } else {
-            dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, idx: idx }));
-        }
+    // const saveParams = (form) => {
+    //     let date;
+    //     let startDateStr = form.elements.time_over?.value;
+    //     if (startDateStr) { // event
+    //         let strArr = startDateStr.split(' ');
+    //         if (strArr.length === 2) { // over date input
+    //             let n = parseInt(strArr[0]);
+    //             let mul = 1000;
+    //             if (strArr[2] === 'm') {
+    //                 mul = 60000;
+    //             }
+    //             if (strArr[2] === 'h') {
+    //                 mul = 3600000;
+    //             }
+    //             date = Date.now() + (n * mul);
+    //         } else {
+    //             date = new Date(form.elements.time_over.value).getTime();
+    //         }
+    //         dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, date: date, type: +form.elements.sel_how.value, idx: idx, timeOver: form.elements.time_over.value }));
+    //     } else {
+    //         dispatch(MyStore.setAction(MyStore.SET_TIMER_PARAMS, { name: form.elements.name.value, idx: idx }));
+    //     }
 
-    }
-    const onClickDel = () => {
-        if (window.confirm("Удалить?")) {
-            dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
-        }
-    }
+    // }
+    // const onClickDel = () => {
+    //     if (window.confirm("Удалить?")) {
+    //         dispatch(MyStore.setAction(MyStore.DEL_TIMER, idx));
+    //     }
+    // }
     const click = (e) => {
+        onClick(idx);
+        // dispatch(MyStore.setAction(MyStore.SET_SEL_ELM_IDX, idx));
+        // console.log("TimerItem click:", idx);
+
         // e.preventDefault();
         // e.stopPropagation();
 
-        let idx = parseInt(e.currentTarget.id);
-        if (e.target.name === 'start_btn') {
-            saveParams(e.currentTarget); // form
-            dispatch(MyStore.setAction(MyStore.START_TIMER, idx));
-        }
-        if (e.target.name === 'pause_btn') {
-            dispatch(MyStore.setAction(MyStore.PAUSE_TIMER, idx));
-        }
-        if (e.target.name === 'stop_btn') {
-            dispatch(MyStore.setAction(MyStore.STOP_TIMER, idx));
-        }
-        if (e.target.name === 'del_btn') {
-            onClickDel();
-        }
-        if (e.target.name === 'show_btn') {
-            dispatch(MyStore.setAction(MyStore.SHOW_TIMER, idx));
-        }
-    }
-    const formSubmit = (e) => {
-        e.preventDefault();
-    }
 
+        // let idx = parseInt(e.currentTarget.id);
+        // if (e.target.name === 'start_btn') {
+        //     saveParams(e.currentTarget); // form
+        //     dispatch(MyStore.setAction(MyStore.START_TIMER, idx));
+        // }
+        // if (e.target.name === 'pause_btn') {
+        //     dispatch(MyStore.setAction(MyStore.PAUSE_TIMER, idx));
+        // }
+        // if (e.target.name === 'stop_btn') {
+        //     dispatch(MyStore.setAction(MyStore.STOP_TIMER, idx));
+        // }
+        // if (e.target.name === 'del_btn') {
+        //     onClickDel();
+        // }
+        // if (e.target.name === 'show_btn') {
+        //     dispatch(MyStore.setAction(MyStore.SHOW_TIMER, idx));
+        // }
+    }
+    // const formSubmit = (e) => {
+    //     e.preventDefault();
+    // }
+    // timerItemSel onSubmit={formSubmit}
     return (
-        <form className={timerStyles.timerListItem} id={idx + '_timer'} onClick={click} onSubmit={formSubmit}>
+
+        <div className={!select ? timerStyles.timerListItem : timerStyles.timerListItem + ' ' + timerStyles.timerItemSel} onClick={click} >
             <TimerHeader elm={elm} />
             {elm.type !== MyStore.TYPE_STOPWATCH ? <EventControls elm={elm} /> : null}
-            <ButtonControls elm={elm} />
-        </form>
+            <span>Статус: {elm.status}</span>
+
+            {/* {console.log("timerStyles.timerListItem:", timerStyles.timerListItem) } */}
+        </div>
     );
 }
 
 export const TimerList = () => {
+    const dispatch = useDispatch();
     const timers = useSelector(MyStore.selTimers);
+    const currSelElmIdx = useSelector(MyStore.selCurrSelElmIdx);
     // const bRender = useSelector(MyStore.selRenderFlag);
+    // const addEvent = () => {
+    //     dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(MyStore.TYPE_EVENT_OVER)));
+    //     // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+    // }
+    // const addStopwatch = () => {
+    //     dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+    // }
+
+    const click = (idx) => {
+        dispatch(MyStore.setAction(MyStore.SET_SEL_ELM_IDX, idx));
+    }
 
     const timersElements = useMemo(() => {
         return timers.map((el, idx) => {
             return (
-                <TimerItem key={idx} idx={idx} elm={el} />
+                <TimerItem key={idx} idx={idx} elm={el} select={currSelElmIdx === idx} onClick={click} />
             )
         });
-    }, [timers]); // ,  bRender
+    }, [timers, currSelElmIdx]); // ,  bRender
+
     return (
-        <div className={timerStyles.timerList}>{timersElements}</div>
+        <div className={timerStyles.timerList}>
+            {timersElements}
+        </div>
+    )
+}
+
+export const TimerControlPanel = () => {
+    // const [currSelItemIdx, setCurrSelItemIdx] = useState(0);
+    // const [currSelElmIdx, setCurrSelElmIdx] = useState(0);
+
+
+    // const selItem = (idx) => {
+    //     setCurrSelElmIdx(idx);
+    // }
+    return (
+        <div className={timerStyles.timerControlPanel}>
+            <ButtonControls idx={0} elm={0} />
+            <TimerList />
+        </div>
+
     )
 }
 
 const TimerTabloid = () => {
-    // const timersToDisplay = useSelector(MyStore.selTimersToDisplay);
     const timers = useSelector(MyStore.selTimers);
-    const bRender = useSelector(MyStore.selRenderFlag);
+    // const bRender = useSelector(MyStore.selRenderFlag);
 
     const renderTimersToDisplay = useMemo(() => {
         const res = timers.map((el, idx) => {
             return (
-                el.displayStatus === MyStore.DISPLAY_STATUS_SHOW ? <TimerTabloidItem key={idx} elm={el} /> : null
+                el.showProgress === MyStore.DISPLAY_STATUS_SHOW ? <TimerTabloidItem key={idx} elm={el} /> : null
             )
         })
         return res;
-    }, [bRender]);
+    }, [timers]); // , bRender
 
     return (
         <div className={timerStyles.timerTtabloid}>
+            {/* <CardViewer list={renderTimersToDisplay} /> */}
             {renderTimersToDisplay}
         </div>
     )
@@ -188,7 +241,7 @@ const TimerTabloid = () => {
 const TimerTabloidItem = ({ elm }) => {
 
     return (
-        <div className={timerStyles.timerTabloidItem}>{elm.name}: {elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.display}</div>
+        <div className={timerStyles.timerTabloidItem}>{elm.name}: {elm.type !== MyStore.TYPE_STOPWATCH ? 'осталось' : 'прошло'} {elm.dateString}</div>
     )
 }
 
@@ -196,7 +249,7 @@ const TimerTabloidItem = ({ elm }) => {
 export const TimerComponent = () => {
     return (
         <div className={timerStyles.timer}>
-            <TimerList />
+            <TimerControlPanel />
             <TimerTabloid />
         </div>
     )

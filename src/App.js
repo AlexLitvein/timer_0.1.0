@@ -19,13 +19,13 @@ function App() {
 
   const dispatch = useDispatch();
 
-  const addEvent = () => {
-    dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(MyStore.TYPE_EVENT_OVER)));
-    // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
-  }
-  const addStopwatch = () => {
-    dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
-  }
+  // const addEvent = () => {
+  //   dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj(MyStore.TYPE_EVENT_OVER)));
+  //   // dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+  // }
+  // const addStopwatch = () => {
+  //   dispatch(MyStore.setAction(MyStore.ADD_TIMER, MyStore.createTimerObj()));
+  // }
   useEffect(() => {
     dispatch(MyStore.setAction(MyStore.LOAD_STORE));
 
@@ -47,8 +47,8 @@ function App() {
   return (
     <div className="App">
       {/* {doRender} */}
-      <button onClick={addStopwatch}>Секундомер</button>
-      <button onClick={addEvent}>Событие</button>
+      {/* <button onClick={addStopwatch}>Секундомер</button>
+      <button onClick={addEvent}>Событие</button> */}
       <TimerComponent />
       {console.log('draw App')}
     </div>

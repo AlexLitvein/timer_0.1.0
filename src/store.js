@@ -1,44 +1,5 @@
 import { createStore } from 'redux';
 
-// const ADD_VAL = 'ADD_VAL';
-
-// const initialState = {
-//     a: 2,
-//     b: 0,
-// };
-
-// export function setVal(payload) {
-//     return {
-//         type: ADD_VAL,
-//         payload,
-//     };
-// }
-
-// export function selValA(store) {
-//     return store.a;
-// }
-
-// function reducer(state = initialState, action) {
-//     switch (action.type) {
-//         case ADD_VAL:
-//             state = { ...state, a: state.a + action.payload };
-//             break;
-
-//         default:
-//             break;
-//     }
-//     return state;
-// }
-
-// function createTimerObj(startDate, endDate, name = 'timer-' + Date.now()) {
-//     return {
-//         name: name,
-//         start: startDate,
-//         end: endDate,
-//         curr: 0,
-//     }
-// }
-
 class MyStore {
     ADD_TIMER = 'ADD_TIMER';
     DEL_TIMER = 'DEL_TIMER';
@@ -49,23 +10,25 @@ class MyStore {
     STOP_TIMER = 'STOP_TIMER';
     PAUSE_TIMER = 'PAUSE_TIMER';
     SHOW_TIMER = 'SHOW_TIMER';
-    STOPED = 0;
-    PAUSED = 1;
-    STARTED = 2;
+    UPDATE_TIMERS = 'UPDATE_TIMERS';
+    SET_SEL_ELM_IDX = 'SET_SEL_ELM_IDX';
+    STOPED = 'Stopped';
+    PAUSED = 'Paused';
+    STARTED = 'Started';
     TYPE_STOPWATCH = 0;
     TYPE_EVENT_OVER = 1;
     TYPE_EVENT_AT = 2;
     DISPLAY_DEFAULT = '00:00:00';
-    DISPLAY_STATUS_NONE = false;
-    DISPLAY_STATUS_SHOW = true;
+    SHOW_PROGRESS = false;
+    // DISPLAY_STATUS_SHOW = true;
     // SET_TIMER_END = 'SET_TIMER_END';
-    SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
+    // SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
+        currSelElmIdx: 0,
         bRender: true,
         timers: [],
-        // timersToDisplay: [] // [idx, idx, ...]
     };
 
     constructor() {
@@ -85,11 +48,11 @@ class MyStore {
     selTimers(store) {
         return store.timers;
     }
-    // selTimersToDisplay(store) {
-    //     return store.timersToDisplay;
-    // }
     selRenderFlag(store) {
         return store.bRender;
+    }
+    selCurrSelElmIdx(store) {
+        return store.currSelElmIdx;
     }
     setAction(action, payload) {
         return {
@@ -110,20 +73,28 @@ class MyStore {
     stopTimer = (state, idx) => {
         const el = state.timers[idx];
         el.status = this.STOPED;
-        el.display = this.DISPLAY_DEFAULT;
+        el.dateString = this.DISPLAY_DEFAULT;
         if (el.type === this.TYPE_STOPWATCH) {
             el.date = 0;
         }
         // console.log("el:", el);
         // console.log("state.timers[idx]:", state.timers[idx]);
     }
-    setTimerParams = (state, params) => {
-        const el = state.timers[params.idx];
-        state.timers[params.idx] = { ...el, ...params };
-    }
+    // setTimerParams = (state, params) => {
+    //     const el = state.timers[params.idx];
+    //     state.timers[params.idx] = { ...el, ...params };
+    // }
     formatDate = (date) => {
         return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
     }
+    // getCurrSelElm=()=>{
+    //     return 
+    // }
+    // updateTimers() {
+    //     return {
+    //         type: this.UPDATE_TIMERS,
+    //     };
+    // }
     #tick(state) {
         console.log('tick');
         state.timers.forEach((el, idx, arr) => {
@@ -141,9 +112,12 @@ class MyStore {
                     }
                     currDate = new Date(sub);
                 }
-                el.display = this.formatDate(currDate);
+                el.dateString = this.formatDate(currDate);
             }
         });
+    }
+    #updateTimers = (state) => {
+        return { ...state, timers: [...state.timers] };
     }
     reducer = (state = this.#initialState, action) => {
         switch (action.type) {
@@ -151,18 +125,28 @@ class MyStore {
                 this.addTimer(state, action.payload);
                 // state = { ...state, timers: [...state.timers] };
                 // state = { ...state, bRender: !state.bRender };
-                state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
+                break;
+            case this.UPDATE_TIMERS:
+                state = this.#updateTimers(state);
+                break;
+            case this.SET_SEL_ELM_IDX:
+                // state.currSelElmIdx = state.timers[action.payload];
+                // state = this.#updateTimers(state);
+                state = { ...state, currSelElmIdx: action.payload };
                 break;
             case this.SHOW_TIMER:
                 // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
-                state.timers[action.payload].displayStatus = !state.timers[action.payload].displayStatus;
+                state.timers[action.payload].showProgress = !state.timers[action.payload].showProgress;
                 // state = { ...state, bRender: !state.bRender };
-                state = { ...state, timers: [...state.timers] };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
             case this.DEL_TIMER:
                 state.timers.splice(action.payload, 1);
                 // state = { ...state, bRender: !state.bRender };
-                state = { ...state, timers: [...state.timers] };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 this.saveStore(state);
                 break;
             case this.LOAD_STORE:
@@ -177,20 +161,23 @@ class MyStore {
             case this.START_TIMER:
                 state.timers[action.payload].status = this.STARTED;
                 // state = { ...state, bRender: !state.bRender };
-                state = { ...state, timers: [...state.timers] };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
             case this.STOP_TIMER:
                 this.stopTimer(state, action.payload);
-                state = { ...state, timers: [...state.timers] };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
             case this.PAUSE_TIMER:
                 state.timers[action.payload].status = this.PAUSED;
-                state = { ...state, timers: [...state.timers] };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
-            case this.SET_TIMER_PARAMS:
-                this.setTimerParams(state, action.payload);
-                // state.timers[action.payload.idx].end = action.payload.date;
-                break;
+            // case this.SET_TIMER_PARAMS:
+            // this.setTimerParams(state, action.payload);
+            // state.timers[action.payload.idx].end = action.payload.date;
+            // break;
             case this.TICK:
                 this.#tick(state);
                 state = { ...state, bRender: !state.bRender };
@@ -201,18 +188,6 @@ class MyStore {
         return state;
     }
 
-    // createTimerObj(name = '', date = 0, type = this.TYPE_STOPWATCH,) {
-    //     return {
-    //         name: name,
-    //         type: type,
-    //         date: date,
-    //         // start: startDate,
-    //         // end: endDate,
-    //         // curr: 0,
-    //         status: this.STOPED,
-    //         display: this.DISPLAY_DEFAULT,
-    //     }
-    // }
     createTimerObj(type = this.TYPE_STOPWATCH) {
         return {
             name: '',
@@ -222,8 +197,8 @@ class MyStore {
             // end: endDate,
             // curr: 0,
             status: this.STOPED,
-            displayStatus: this.DISPLAY_STATUS_NONE,
-            display: this.DISPLAY_DEFAULT,
+            showProgress: this.SHOW_PROGRESS,
+            dateString: this.DISPLAY_DEFAULT,
         }
     }
 }
