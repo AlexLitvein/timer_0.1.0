@@ -12,7 +12,11 @@ form {
   flex-grow: 1;
 } */
 
+<<<<<<< HEAD
 .timerList {
+=======
+.timerList {  
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
   flex-direction: column;
   /* width: 260px; */
   border: 1px solid peru;
