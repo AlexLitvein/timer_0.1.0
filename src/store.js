@@ -145,7 +145,8 @@ class MyStore {
         break;
       case this.SHOW_TIMER:
         // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
-        state.timers[action.payload].showProgress = !state.timers[action.payload].showProgress;
+        state.timers[action.payload].showProgress =
+          !state.timers[action.payload].showProgress;
         // state = { ...state, bRender: !state.bRender };
         // state = { ...state, timers: [...state.timers] };
         state = this.#updateTimers(state);

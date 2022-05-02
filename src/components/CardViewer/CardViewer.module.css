@@ -1,4 +1,5 @@
 .cardViewer {
+<<<<<<< HEAD
   display: flex;
   flex-direction: column;
 }
@@ -16,4 +17,23 @@
 
 .cardView {
   flex-grow: 1;
+=======
+    display: flex;
+    flex-direction: column;
+}
+
+.cardList {
+    display: flex;
+    /* flex-grow: 1; */
+    flex-wrap: wrap;
+    background-color: aquamarine;
+}
+
+.cardList > * {
+    flex-grow: 1;
+}
+
+.cardView {
+    flex-grow: 1;
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
 }
