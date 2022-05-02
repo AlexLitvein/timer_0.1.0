@@ -1,63 +1,146 @@
 import { createStore } from 'redux';
 
-// const ADD_VAL = 'ADD_VAL';
-
-// const initialState = {
-//     a: 2,
-//     b: 0,
-// };
-
-// export function setVal(payload) {
-//     return {
-//         type: ADD_VAL,
-//         payload,
-//     };
-// }
-
-// export function selValA(store) {
-//     return store.a;
-// }
-
-// function reducer(state = initialState, action) {
-//     switch (action.type) {
-//         case ADD_VAL:
-//             state = { ...state, a: state.a + action.payload };
-//             break;
-
-//         default:
-//             break;
-//     }
-//     return state;
-// }
-
-// function createTimerObj(startDate, endDate, name = 'timer-' + Date.now()) {
-//     return {
-//         name: name,
-//         start: startDate,
-//         end: endDate,
-//         curr: 0,
-//     }
-// }
-
 class MyStore {
+<<<<<<< HEAD
+  ADD_TIMER = 'ADD_TIMER';
+  DEL_TIMER = 'DEL_TIMER';
+  LOAD_STORE = 'LOAD_STORE';
+  SAVE_STORE = 'SAVE_STORE';
+  TICK = 'TICK';
+  START_TIMER = 'START_TIMER';
+  STOP_TIMER = 'STOP_TIMER';
+  PAUSE_TIMER = 'PAUSE_TIMER';
+  SHOW_TIMER = 'SHOW_TIMER';
+  UPDATE_TIMERS = 'UPDATE_TIMERS';
+  SET_SEL_ELM_IDX = 'SET_SEL_ELM_IDX';
+  STOPED = 'Stopped';
+  PAUSED = 'Paused';
+  STARTED = 'Started';
+  TYPE_STOPWATCH = 0;
+  TYPE_EVENT_OVER = 1;
+  TYPE_EVENT_AT = 2;
+  DISPLAY_DEFAULT = '00:00:00';
+  SHOW_PROGRESS = false;
+  // DISPLAY_STATUS_SHOW = true;
+  // SET_TIMER_END = 'SET_TIMER_END';
+  // SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
+
+  // держим в классе, чтобы видеть структуру объекта
+  #initialState = {
+    currSelElmIdx: 0,
+    bRender: true,
+    timers: [],
+  };
+
+  constructor() {
+    this.store = createStore(this.reducer);
+  }
+  loadStore() {
+    let store;
+    const str = localStorage.getItem('my_timer');
+    if (str) {
+      store = JSON.parse(str);
+    }
+    return store;
+  }
+  saveStore(state) {
+    localStorage.setItem('my_timer', JSON.stringify(state));
+  }
+  selTimers(store) {
+    return store.timers;
+  }
+  selRenderFlag(store) {
+    return store.bRender;
+  }
+  selCurrSelElmIdx(store) {
+    return store.currSelElmIdx;
+  }
+  setAction(action, payload) {
+    return {
+      type: action,
+      payload,
+=======
     ADD_TIMER = 'ADD_TIMER';
+    DEL_TIMER = 'DEL_TIMER';
     LOAD_STORE = 'LOAD_STORE';
+    SAVE_STORE = 'SAVE_STORE';
     TICK = 'TICK';
     START_TIMER = 'START_TIMER';
     STOP_TIMER = 'STOP_TIMER';
     PAUSE_TIMER = 'PAUSE_TIMER';
-    STOPED = 0;
-    PAUSED = 1;
-    STARTED = 2;
+    SHOW_TIMER = 'SHOW_TIMER';
+    UPDATE_TIMERS = 'UPDATE_TIMERS';
+    SET_SEL_ELM_IDX = 'SET_SEL_ELM_IDX';
+    STOPED = 'Stopped';
+    PAUSED = 'Paused';
+    STARTED = 'Started';
+    TYPE_STOPWATCH = 0;
+    TYPE_EVENT_OVER = 1;
+    TYPE_EVENT_AT = 2;
+    DISPLAY_DEFAULT = '00:00:00';
+    SHOW_PROGRESS = false;
+    // DISPLAY_STATUS_SHOW = true;
+    // SET_TIMER_END = 'SET_TIMER_END';
+    // SET_TIMER_PARAMS = 'SET_TIMER_PARAMS';
 
     // держим в классе, чтобы видеть структуру объекта
     #initialState = {
+        currSelElmIdx: 0,
         bRender: true,
-        timers: []
+        timers: [],
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
     };
-
-    constructor() {
-        this.store = createStore(this.reducer);
+  }
+  addTimer = (state, timer) => {
+    if (!timer.name) {
+      if (timer.type === this.TYPE_STOPWATCH) {
+        timer.name = 'timer ' + state.timers.length;
+      } else {
+        timer.name = 'event ' + state.timers.length;
+      }
+    }
+    state.timers.push(timer);
+  };
+  stopTimer = (state, idx) => {
+    const el = state.timers[idx];
+    el.status = this.STOPED;
+    el.dateString = this.DISPLAY_DEFAULT;
+    if (el.type === this.TYPE_STOPWATCH) {
+      el.date = 0;
+    }
+<<<<<<< HEAD
+    // console.log("el:", el);
+    // console.log("state.timers[idx]:", state.timers[idx]);
+  };
+  // setTimerParams = (state, params) => {
+  //     const el = state.timers[params.idx];
+  //     state.timers[params.idx] = { ...el, ...params };
+  // }
+  formatDate = (date) => {
+    return (
+      ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) +
+      ':' +
+      ('0' + date.getMinutes()).slice(-2) +
+      ':' +
+      ('0' + date.getSeconds()).slice(-2)
+    );
+  };
+  // getCurrSelElm=()=>{
+  //     return
+  // }
+  // updateTimers() {
+  //     return {
+  //         type: this.UPDATE_TIMERS,
+  //     };
+  // }
+  #tick(state) {
+    console.log('tick');
+    state.timers.forEach((el, idx, arr) => {
+      let currDate = 0;
+      if (el.status === this.STARTED) {
+=======
+    saveStore(state) {
+        localStorage.setItem('my_timer', JSON.stringify(state));
     }
     selTimers(store) {
         return store.timers;
@@ -65,72 +148,220 @@ class MyStore {
     selRenderFlag(store) {
         return store.bRender;
     }
+    selCurrSelElmIdx(store) {
+        return store.currSelElmIdx;
+    }
     setAction(action, payload) {
         return {
             type: action,
             payload,
         };
     }
+    addTimer = (state, timer) => {
+        if (!timer.name) {
+            if (timer.type === this.TYPE_STOPWATCH) {
+                timer.name = 'timer ' + state.timers.length;
+            } else {
+                timer.name = 'event ' + state.timers.length;
+            }
+        }
+        state.timers.push(timer);
+    }
+    stopTimer = (state, idx) => {
+        const el = state.timers[idx];
+        el.status = this.STOPED;
+        el.dateString = this.DISPLAY_DEFAULT;
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
+        if (el.type === this.TYPE_STOPWATCH) {
+          // если секундомер (stopwatch)
+          el.date += 1000;
+          currDate = new Date(el.date);
+        } else {
+          // event
+          currDate = Date.now();
+          let sub = new Date(el.date - Date.now());
+          if (sub <= 0) {
+            sub = 0;
+            this.stopTimer(state, idx);
+          }
+          currDate = new Date(sub);
+        }
+<<<<<<< HEAD
+        el.dateString = this.formatDate(currDate);
+      }
+    });
+  }
+  #updateTimers = (state) => {
+    return { ...state, timers: [...state.timers] };
+  };
+  reducer = (state = this.#initialState, action) => {
+    switch (action.type) {
+      case this.ADD_TIMER:
+        this.addTimer(state, action.payload);
+        // state = { ...state, timers: [...state.timers] };
+        // state = { ...state, bRender: !state.bRender };
+        state = this.#updateTimers(state);
+        break;
+      case this.UPDATE_TIMERS:
+        state = this.#updateTimers(state);
+        break;
+      case this.SET_SEL_ELM_IDX:
+        // state.currSelElmIdx = state.timers[action.payload];
+        // state = this.#updateTimers(state);
+        state = { ...state, currSelElmIdx: action.payload };
+        break;
+      case this.SHOW_TIMER:
+        // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
+        state.timers[action.payload].showProgress = !state.timers[action.payload].showProgress;
+        // state = { ...state, bRender: !state.bRender };
+        // state = { ...state, timers: [...state.timers] };
+        state = this.#updateTimers(state);
+        break;
+      case this.DEL_TIMER:
+        state.timers.splice(action.payload, 1);
+        // state = { ...state, bRender: !state.bRender };
+        // state = { ...state, timers: [...state.timers] };
+        state = this.#updateTimers(state);
+        this.saveStore(state);
+        break;
+      case this.LOAD_STORE:
+        // const oldStore = this.loadStore();
+        // if (oldStore) {
+        //   state = oldStore;
+        // }
+        state = this.loadStore() || state;
+        break;
+      case this.SAVE_STORE:
+        this.saveStore(state);
+        break;
+      case this.START_TIMER:
+        state.timers[action.payload].status = this.STARTED;
+        // state = { ...state, bRender: !state.bRender };
+        // state = { ...state, timers: [...state.timers] };
+        state = this.#updateTimers(state);
+        break;
+      case this.STOP_TIMER:
+        this.stopTimer(state, action.payload);
+        // state = { ...state, timers: [...state.timers] };
+        state = this.#updateTimers(state);
+        break;
+      case this.PAUSE_TIMER:
+        state.timers[action.payload].status = this.PAUSED;
+        // state = { ...state, timers: [...state.timers] };
+        state = this.#updateTimers(state);
+        break;
+      // case this.SET_TIMER_PARAMS:
+      // this.setTimerParams(state, action.payload);
+      // state.timers[action.payload.idx].end = action.payload.date;
+      // break;
+      case this.TICK:
+        this.#tick(state);
+        state = { ...state, bRender: !state.bRender };
+        break;
+      default:
+        break;
+=======
+        // console.log("el:", el);
+        // console.log("state.timers[idx]:", state.timers[idx]);
+    }
+    // setTimerParams = (state, params) => {
+    //     const el = state.timers[params.idx];
+    //     state.timers[params.idx] = { ...el, ...params };
+    // }
+    formatDate = (date) => {
+        return ('0' + (date.getHours() + date.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+    }
+    // getCurrSelElm=()=>{
+    //     return 
+    // }
+    // updateTimers() {
+    //     return {
+    //         type: this.UPDATE_TIMERS,
+    //     };
+    // }
     #tick(state) {
         console.log('tick');
-
         state.timers.forEach((el, idx, arr) => {
-            // console.log(el);
-
-            // switch (el.status) {
-            //     case this.STARTED:
-            //         arr[idx].start += 1000;
-            //         break;
-            //     default:
-            //         break;
-            // }
-            // let currDate = new Date(arr[idx].start);
-            // arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
-
             let currDate = 0;
             if (el.status === this.STARTED) {
-                // console.log('STARTED');
-                if (el.end === 0) { // если секундомер
-                    arr[idx].start += 1000;
-                    currDate = new Date(arr[idx].start);
-                } else { // stopwatch
-                    arr[idx].end -= 1000;
-                    let sub = new Date(arr[idx].end - arr[idx].start);
+                if (el.type === this.TYPE_STOPWATCH) { // если секундомер (stopwatch)
+                    el.date += 1000;
+                    currDate = new Date(el.date);
+                } else { // event
+                    currDate = Date.now();
+                    let sub = new Date(el.date - Date.now());
                     if (sub <= 0) {
                         sub = 0;
-                        arr[idx].status = this.STOPED;
+                        this.stopTimer(state, idx);
                     }
                     currDate = new Date(sub);
                 }
-
-                // let currDate = new Date(Date.now() - el.start);
-                arr[idx].display = ('0' + (currDate.getHours() + currDate.getTimezoneOffset() / 60)).slice(-2) + ':' + ('0' + currDate.getMinutes()).slice(-2) + ':' + ('0' + currDate.getSeconds()).slice(-2);
-                // `${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`
+                el.dateString = this.formatDate(currDate);
             }
-
-
         });
+    }
+    #updateTimers = (state) => {
+        return { ...state, timers: [...state.timers] };
     }
     reducer = (state = this.#initialState, action) => {
         switch (action.type) {
             case this.ADD_TIMER:
-                state = { ...state, timers: [...state.timers, action.payload] };
+                this.addTimer(state, action.payload);
+                // state = { ...state, timers: [...state.timers] };
+                // state = { ...state, bRender: !state.bRender };
+                state = this.#updateTimers(state);
+                break;
+            case this.UPDATE_TIMERS:
+                state = this.#updateTimers(state);
+                break;
+            case this.SET_SEL_ELM_IDX:
+                // state.currSelElmIdx = state.timers[action.payload];
+                // state = this.#updateTimers(state);
+                state = { ...state, currSelElmIdx: action.payload };
+                break;
+            case this.SHOW_TIMER:
+                // state = { ...state, timersToDisplay: [...state.timersToDisplay, action.payload] };
+                state.timers[action.payload].showProgress = !state.timers[action.payload].showProgress;
+                // state = { ...state, bRender: !state.bRender };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
+                break;
+            case this.DEL_TIMER:
+                state.timers.splice(action.payload, 1);
+                // state = { ...state, bRender: !state.bRender };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
+                this.saveStore(state);
                 break;
             case this.LOAD_STORE:
-                state = action.payload;
+                const oldStore = this.loadStore();
+                if (oldStore) {
+                    state = oldStore;
+                }
+                break;
+            case this.SAVE_STORE:
+                this.saveStore(state);
                 break;
             case this.START_TIMER:
                 state.timers[action.payload].status = this.STARTED;
-                state = { ...state, bRender: !state.bRender };
+                // state = { ...state, bRender: !state.bRender };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
             case this.STOP_TIMER:
-                state.timers[action.payload].status = this.STOPED;
-                // state = { ...state, bRender: !state.bRender };
+                this.stopTimer(state, action.payload);
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
             case this.PAUSE_TIMER:
                 state.timers[action.payload].status = this.PAUSED;
-                // state = { ...state, bRender: !state.bRender };
+                // state = { ...state, timers: [...state.timers] };
+                state = this.#updateTimers(state);
                 break;
+            // case this.SET_TIMER_PARAMS:
+            // this.setTimerParams(state, action.payload);
+            // state.timers[action.payload.idx].end = action.payload.date;
+            // break;
             case this.TICK:
                 this.#tick(state);
                 state = { ...state, bRender: !state.bRender };
@@ -139,20 +370,40 @@ class MyStore {
                 break;
         }
         return state;
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
     }
+    return state;
+  };
 
-    createTimerObj(startDate = 0, endDate = 0, name = 'timer-' + Date.now()) {
+<<<<<<< HEAD
+  createTimerObj(type = this.TYPE_STOPWATCH) {
+    return {
+      name: '',
+      type: type,
+      date: 0,
+      timeOver: '',
+      // end: endDate,
+      // curr: 0,
+      status: this.STOPED,
+      showProgress: this.SHOW_PROGRESS,
+      dateString: this.DISPLAY_DEFAULT,
+    };
+  }
+=======
+    createTimerObj(type = this.TYPE_STOPWATCH) {
         return {
-            name: name,
-            start: startDate,
-            end: endDate,
-            curr: 0,
+            name: '',
+            type: type,
+            date: 0,
+            timeOver: '',
+            // end: endDate,
+            // curr: 0,
             status: this.STOPED,
-            display: '00:00:00',
+            showProgress: this.SHOW_PROGRESS,
+            dateString: this.DISPLAY_DEFAULT,
         }
     }
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
 }
 
 export default new MyStore();
-// export default new MyStore();
-// export const MyStore = createStore(reducer);

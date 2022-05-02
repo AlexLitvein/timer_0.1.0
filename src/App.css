@@ -1,8 +1,43 @@
 .App {
   /* text-align: center; */
+  height: 100vh;
+  display: flex;
 }
 
-.timer-elm{
+/* .timer{
+  display:flex;
+  height:100%;
+  border: 1px solid green;
+}
+
+.timer-name-input{
+  width: 7rem;
+}
+
+.timer-tabloid{
+  display:flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  border: 1px solid green;
+}
+
+.timer-tabloid-item{
+  flex-grow: 1;
+  border: 1px solid plum;
+  height: 50px;
+  min-width: 100px;
+}
+
+.timer-list{
+  border: 1px solid peru;
+
+}
+
+.timer-list-item{
   border: 1px solid gray;
   margin: 2px;
 }
+
+.btn-status{
+  background-color:chartreuse;
+} */

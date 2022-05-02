@@ -1,0 +1,96 @@
+.timer {
+  font-size: 14px;
+  display: flex;
+  flex-grow: 1;
+  /* height: 100%; */
+  border: 1px solid green;
+}
+
+/* .timer div,
+form {
+  display: flex;
+  flex-grow: 1;
+} */
+
+<<<<<<< HEAD
+.timerList {
+=======
+.timerList {  
+>>>>>>> 56aa5e9ebb5b4ab9dadaf3be04adfb69d20b7846
+  flex-direction: column;
+  /* width: 260px; */
+  border: 1px solid peru;
+}
+
+.timerListItem input,
+button,
+select {
+  flex-grow: 1;
+  /* background-color: brown; */
+}
+
+.timerListItem {
+  display: flex;
+  /* flex-grow: initial; */
+  flex-direction: column;
+  border: 1px solid gray;
+  padding: 4px;
+}
+
+.timerItemSel {
+  background-color: cornflowerblue;
+}
+
+.btnActive {
+  background-color: chartreuse;
+}
+
+.timerNameInput {
+  /* width: 7rem; */
+}
+
+.eventControls {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.timerControlButtons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.timerControlPanel {
+  /* flex-direction: column; */
+  min-width: 200px;
+  overflow-y: auto;
+  /* display: flex; */
+  /* flex-grow: 1; */
+  /* flex-wrap: wrap; */
+  border: 1px solid green;
+  /* height:100%; */
+}
+
+.timerControlPanelCommands {
+  max-height: 2rem;
+}
+
+.timerTtabloid {
+  display: flex;
+  /* flex-grow: 1; */
+  /* flex-wrap: wrap; */
+  border: 1px solid green;
+  /* height:100%; */
+}
+
+/* .timerTtabloid :first-child {
+  display: flex;
+  flex-grow: 3;
+  border: 1px solid yellowgreen;
+  width: 100%;
+  height: 50%;
+} */
+.timerTabloidItem {
+  border: 1px solid plum;
+  height: 50px;
+  width: 150px;
+}
