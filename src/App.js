@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { TimerComponent, TimerList } from './Timer';
 
 function App() {
-
   // let now0 = Date.now();
   // let now = new Date(Date.now());
   // let date1 = new Date().getTime();
@@ -15,7 +14,6 @@ function App() {
   // let res = new Date(date);
   // let tz = res.getTimezoneOffset();
   // res.setHours(res.getHours() - tz / 60);
-
 
   const dispatch = useDispatch();
 
@@ -32,8 +30,8 @@ function App() {
     const t1 = setInterval(() => {
       dispatch(MyStore.setAction(MyStore.TICK));
     }, 1000);
-    
-    window.addEventListener("beforeunload", () => {
+
+    window.addEventListener('beforeunload', () => {
       dispatch(MyStore.setAction(MyStore.SAVE_STORE));
     });
 
@@ -45,14 +43,13 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className='App'>
       {/* {doRender} */}
       {/* <button onClick={addStopwatch}>Секундомер</button>
       <button onClick={addEvent}>Событие</button> */}
       <TimerComponent />
       {console.log('draw App')}
     </div>
-
   );
 }
 

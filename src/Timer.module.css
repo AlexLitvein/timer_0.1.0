@@ -12,7 +12,7 @@ form {
   flex-grow: 1;
 } */
 
-.timerList {  
+.timerList {
   flex-direction: column;
   /* width: 260px; */
   border: 1px solid peru;
